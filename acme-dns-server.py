@@ -5,6 +5,7 @@ import re
 import socketserver
 import struct
 import sys
+import os
 
 
 HEADER = '!HBBHHHH'
@@ -36,7 +37,7 @@ class DNSHandler(socketserver.BaseRequestHandler):
       name = '.'.join(name_parts)
 
       if not DOMAIN_PATTERN.match(name):
-        print('Invalid domain received: ' + name)
+        print('pythondnsd: Invalid domain received: ' + name)
         # Contains invalid characters, don't continue since it may be path traversal hacking
         return
 
@@ -44,7 +45,7 @@ class DNSHandler(socketserver.BaseRequestHandler):
 
       questions.append({'name': name, 'type': qtype, 'class': qclass})
 
-    print('Got request for ' + questions[0]['name'] + ' from ' + str(self.client_address[0]) + ':' + str(self.client_address[1]))
+    print('pythondnsd: Got request for ' + questions[0]['name'] + ' from ' + str(self.client_address[0]) + ':' + str(self.client_address[1]))
 
     # Read answers
     try:
@@ -86,17 +87,25 @@ class DNSHandler(socketserver.BaseRequestHandler):
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='Simple TXT DNS server')
+  parser.add_argument('host', metavar='host', type=str,
+                      help='host to listen on')
   parser.add_argument('port', metavar='port', type=int,
                       help='port to listen on')
   parser.add_argument('path', metavar='path', type=str,
                       help='path to find results')
 
   args = parser.parse_args()
+  host = args.host
   port = args.port
   data_path = args.path
 
-  server = socketserver.ThreadingUDPServer(('', port), DNSHandler)
-  print('Running on port %d' % port)
+  thisdir = os.path.dirname(os.path.realpath(__file__))
+  f = open("%s/acme-dns-server.pid" % thisdir, "w")
+  f.write(str(os.getpid()))
+  f.close()
+
+  server = socketserver.ThreadingUDPServer((host, port), DNSHandler)
+  print('pythondnsd: Listening on %s:%d' % (host, port))
 
   try:
     server.serve_forever()
