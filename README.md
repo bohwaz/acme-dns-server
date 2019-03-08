@@ -8,4 +8,6 @@ My goal was to have a simple standalone solution for issuing wildcard certificat
 
 1. Execute `setup.sh` (current user needs to be root or able to use sudo).
 
-2. Adjust owner/chmod for /opt/acme-challenge/records
+2. Adjust owner/chmod for `/opt/acme-challenge/records`.
+
+3. Check whether settings in `/etc/default/acme-dns-server` are correct.

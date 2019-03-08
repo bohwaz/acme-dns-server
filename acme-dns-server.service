@@ -3,7 +3,8 @@ Description=Simple DNS server that can reply to ACME DNS-01 challenges
 After=network-online.target
 
 [Service]
-ExecStart=/usr/bin/acme-dns-server.py 0.0.0.0 53 /opt/acme-challenge/records
+EnvironmentFile=/etc/default/acme-dns-server
+ExecStart=/usr/bin/acme-dns-server.py ${ACME_DNS_HOST} 53 ${ACME_DNS_DIRECTORY}
 
 [Install]
 WantedBy=multi-user.target

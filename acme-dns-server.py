@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 import argparse
+import grp
 import io
+import os
 import pwd
 import re
 import socketserver
 import struct
 import sys
-import os
 
 
 HEADER = '!HBBHHHH'
@@ -100,21 +101,20 @@ if __name__ == '__main__':
   port = args.port
   data_path = args.path
 
-  if port < 1024 and os.getuid() != 1000
+  if port < 1024 and os.getuid() != 0:
     print("Must be root to attach to port <1024", file=sys.stderr);
     exit(1)
 
   server = socketserver.ThreadingUDPServer((host, port), DNSHandler)
   print('pythondnsd: Listening on %s:%d' % (host, port))
 
-  if os.getuid() == 0
+  if os.getuid() == 0:
     nobody = pwd.getpwnam("nobody").pw_uid
-    nogroup = pwd.getgrnam("nogroup").gr_gid
+    nogroup = grp.getgrnam("nogroup").gr_gid
 
     os.setgroups([])
     os.setgid(nogroup)
     os.setuid(nobody)
-    os.umask(077)
 
   try:
     server.serve_forever()
