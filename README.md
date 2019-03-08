@@ -6,17 +6,6 @@ My goal was to have a simple standalone solution for issuing wildcard certificat
 
 ## Set up
 
-1. Copy `dns_pythondnsd.sh` to `~/.acme.sh/`.
+1. Execute `setup.sh` (current user needs to be root or able to use sudo).
 
-2. Make sure what `_acme-challenge.example.org` has a NS record pointing to this server.
-
-Then:
-
-```bash
-# This only needs to be done once.
-export PYTHONDNSD_Path=/path/to/this/repo # without trailing slash!
-export PYTHONDNSD_Host=0.0.0.0 # This probably won't work due to systemd-resolve,
-                               # so this needs to be the public IP address.
-
-acme.sh --dns dns_pythondnsd -d example.org
-```
+2. Adjust owner/chmod for /opt/acme-challenge/records

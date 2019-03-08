@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import io
+import pwd
 import re
 import socketserver
 import struct
@@ -99,13 +100,21 @@ if __name__ == '__main__':
   port = args.port
   data_path = args.path
 
-  thisdir = os.path.dirname(os.path.realpath(__file__))
-  f = open("%s/acme-dns-server.pid" % thisdir, "w")
-  f.write(str(os.getpid()))
-  f.close()
+  if port < 1024 and os.getuid() != 1000
+    print("Must be root to attach to port <1024", file=sys.stderr);
+    exit(1)
 
   server = socketserver.ThreadingUDPServer((host, port), DNSHandler)
   print('pythondnsd: Listening on %s:%d' % (host, port))
+
+  if os.getuid() == 0
+    nobody = pwd.getpwnam("nobody").pw_uid
+    nogroup = pwd.getgrnam("nogroup").gr_gid
+
+    os.setgroups([])
+    os.setgid(nogroup)
+    os.setuid(nobody)
+    os.umask(077)
 
   try:
     server.serve_forever()

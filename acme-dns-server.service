@@ -1,0 +1,9 @@
+[Unit]
+Description=Simple DNS server that can reply to ACME DNS-01 challenges
+After=network-online.target
+
+[Service]
+ExecStart=/usr/bin/acme-dns-server.py 0.0.0.0 53 /opt/acme-challenge/records
+
+[Install]
+WantedBy=multi-user.target
